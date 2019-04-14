@@ -1,0 +1,64 @@
+{% extends "main.html" %}
+{% block content %}
+{% include "header.html" %}
+	
+	<div class="row divider green">
+		<div class="col-md-12"></div>
+	</div>
+	<div class="row padding-top padding-bottom">
+		<div class="col-md-1"></div>
+		<div class="col-md-11 padding-none">
+			
+		</div>
+		<div class="col-md-7"></div>
+	</div>
+
+	<div class="row padding-top padding-bottom">
+		<div class="col-md-1"></div>
+		<div class="col-md-11 padding-none">
+			<a href="{{url_for('add_player', team_nickname = team.nickname )}}">
+				<button class="btn btn-default" id="add-player">
+					<span class="glyphicon glyphicon-glass" aria-hidden="true"></span>Add Player
+				</button>
+			</a>
+		</div>
+		<div class="col-md-7"></div>
+	</div>
+
+	{% if items !=[] %}	
+		<div class="row">
+			<div class="col-md-1"></div>
+			<div class="col-md-3">
+				<h2>Goaltenders</h2>
+					{% for i in items %}
+						{% if i.position == 'Goaltender' %}
+							<div class="player">
+								<h3>{{i.name}} ({{i.jersey_number}})</h3>
+							</div>
+						{% endif %}
+					{% endfor %}
+			</div>
+			<div class="col-md-4">			
+				<h2>Defencemen</h2>
+                    {% for i in items %}
+                        {% if i.position == 'Defenceman' %}
+                            <div class="player">
+                                <h3>{{i.name}} ({{i.jersey_number}})</h3>
+                            </div>
+                        {% endif %}
+                    {% endfor %}
+			</div>
+			<div class="col-md-3">
+				<h2>Offencemen</h2>
+                    {% for i in items %}
+                        {% if i.position == 'Offenceman' %}
+                            <div class="player">
+								<h3>{{i.name}} ({{i.jersey_number}})</h3>
+                            </div>
+                        {% endif %}
+                    {% endfor %}
+        </div>
+        <div class="col-md-1"></div>
+		</div>
+	{% endif %}
+{% endblock %}
