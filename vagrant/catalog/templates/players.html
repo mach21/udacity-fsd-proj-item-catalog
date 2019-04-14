@@ -34,6 +34,8 @@
 						{% if i.position == 'Goaltender' %}
 							<div class="player">
 								<h3>{{i.name}} ({{i.jersey_number}})</h3>
+								<a href='{{url_for('edit_player', team_nickname = team.nickname, player_id=i.id ) }}'>Edit</a> | 
+								<a href='{{url_for('delete_player', team_nickname = team.nickname, player_id=i.id ) }}'>Delete</a>
 							</div>
 						{% endif %}
 					{% endfor %}
@@ -43,7 +45,9 @@
                     {% for i in items %}
                         {% if i.position == 'Defenceman' %}
                             <div class="player">
-                                <h3>{{i.name}} ({{i.jersey_number}})</h3>
+								<h3>{{i.name}} ({{i.jersey_number}})</h3>
+								<a href='{{url_for('edit_player', team_nickname = team.nickname, player_id=i.id ) }}'>Edit</a> | 
+								<a href='{{url_for('delete_player', team_nickname = team.nickname, player_id=i.id ) }}'>Delete</a>								
                             </div>
                         {% endif %}
                     {% endfor %}
@@ -54,6 +58,8 @@
                         {% if i.position == 'Offenceman' %}
                             <div class="player">
 								<h3>{{i.name}} ({{i.jersey_number}})</h3>
+								<a href='{{url_for('edit_player', team_nickname = team.nickname, player_id=i.id ) }}'>Edit</a> | 
+								<a href='{{url_for('delete_player', team_nickname = team.nickname, player_id=i.id ) }}'>Delete</a>								
                             </div>
                         {% endif %}
                     {% endfor %}

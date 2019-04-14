@@ -15,33 +15,24 @@
 				<div class="form-group">
 					
 					<label for="name">Name:</label>
-					<input type ="text" maxlength="50" class="form-control" name="name"placeholder="Name of the Player">
+					<input type ="text" maxlength="50" class="form-control" name="name" placeholder="Name of the Player">
 
 					<p></p>
 					<label for="jersey_number">Jersey Number:</label>
-					<input type ="text" maxlength="2" class="form-control" name="jersey_number"placeholder="Jersey Number">
+					<input type ="text" maxlength="2" class="form-control" name="jersey_number" placeholder="Jersey Number">
 
 					<p></p>
 					<label for="position">Position:</label>
-					<div class="radio">
-					  <label>
-					    <input type="radio" name="position" id="position1" value="Goaltender">Goaltender
-					  </label>
-					</div>
-					<div class="radio">
-					  <label>
-					    <input type="radio" name="position" id="position2" value="Defenceman">Defenceman
-					  </label>
-					</div>
-					<div class="radio">
-					  <label>
-					    <input type="radio" name="position" id="position3" value="Offenceman">Offenceman
-					  </label>
-					</div>
+					<select name="position" id="position">
+							<option value="Goaltender">Goaltender</option>
+							<option value="Defenceman">Defenceman</option>
+							<option value="Offenceman">Offenceman</option>
+					</select>
 
 					<p></p>
 					<button type="submit" class="btn btn-default" id="submit" type="submit">
 					<span class="glyphicon glyphicon-glass" aria-hidden="true"></span>Create</button>
+					<a href= '{{url_for('show_players', team_nickname=team_nickname)}}'>Cancel</a>
 				</div>
 			</form>
 		</div>

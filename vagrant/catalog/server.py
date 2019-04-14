@@ -40,7 +40,7 @@ def get_players_json():
 @app.route('/teams/')
 def show_teams():
     teams = session.query(Team).order_by(asc(Team.name))
-    return render_template('public-teams.html', teams=teams)
+    return render_template('teams.html', teams=teams)
 
 
 @app.route('/teams/<string:team_nickname>/')
@@ -49,7 +49,7 @@ def show_players(team_nickname):
     team = session.query(Team).filter_by(nickname=team_nickname).one()
     items = session.query(Player).filter_by(
         team_id=team.id).all()
-    return render_template('public-players.html', items=items, team=team)
+    return render_template('players.html', items=items, team=team)
 
 
 @app.route('/teams/<string:team_nickname>/new/', methods=['GET', 'POST'])
@@ -76,8 +76,47 @@ def add_player(team_nickname):
             # TODO treat non-unique jersey number
             # flash('That jersey number is already taken, please try again!')
         return redirect(url_for('show_players', team_nickname=team_nickname))
-    elif request.method == 'GET':
+    else:
         return render_template('new-player.html', team_nickname=team_nickname)
+
+
+@app.route('/teams/<string:team_nickname>/<int:player_id>/edit',
+           methods=['GET', 'POST'])
+def edit_player(team_nickname, player_id):
+    editedItem = session.query(Player).filter_by(id=player_id).one()
+    if request.method == 'POST':
+        if request.form['name']:
+            editedItem.name = request.form['name']
+        if request.form['jersey_number']:
+            editedItem.jersey_number = request.form['jersey_number']
+        if request.form['position']:
+            editedItem.position = request.form['position']
+        session.add(editedItem)
+        session.commit()
+        return redirect(url_for('show_players', team_nickname=team_nickname))
+    else:
+        return render_template(
+            'edit-player.html',
+            team_nickname=team_nickname,
+            player_id=player_id,
+            item=editedItem
+        )
+
+
+@app.route('/teams/<string:team_nickname>/<int:player_id>/delete/',
+           methods=['GET', 'POST'])
+def delete_player(team_nickname, player_id):
+    itemToDelete = session.query(Player).filter_by(id=player_id).one()
+    if request.method == 'POST':
+        session.delete(itemToDelete)
+        session.commit()
+        return redirect(url_for('show_players', team_nickname=team_nickname))
+    else:
+        return render_template(
+            'delete-player.html',
+            item=itemToDelete,
+            team_nickname=team_nickname
+        )
 
 
 if __name__ == '__main__':
