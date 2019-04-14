@@ -36,7 +36,7 @@ class Player(Base):
 
     id = Column(Integer, primary_key=True, autoincrement=True)
     name = Column(String(50), nullable=False)
-    jersey_number = Column(Integer, nullable=False, unique=True)
+    jersey_number = Column(Integer, nullable=False)
     position = Column(String(15), nullable=False)
     team_id = Column(Integer, ForeignKey('team.id'))
     team = relationship(Team)
