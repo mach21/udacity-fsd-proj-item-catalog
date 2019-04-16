@@ -52,7 +52,7 @@ def handle_db_error(error):
 @app.route('/api/v1/catalog.json')
 def get_catalog_json():
     '''
-    API endpoint to pretty-list the entire catalog
+    API endpoint to pretty-list the entire catalog.
 
     :returns: json-formatted catalog
     :raises: DBError for any DB transaction issues
@@ -94,7 +94,7 @@ def get_catalog_json():
 def show_teams():
     '''
     show teams route
-    Render the list of teams in the DB
+    Render the list of teams in the DB.
 
     :returns: render template
     :raises: DBError for any DB transaction issues
@@ -116,7 +116,7 @@ def show_teams():
 def show_players(team_nickname):
     '''
     show players route
-    Render the list of players for a given team
+    Render the list of players for a given team.
 
     @param team_nickname: the nickname of the team to list players for
     :returns: render template
@@ -136,9 +136,37 @@ def show_players(team_nickname):
     return render_template('players.html', items=items, team=team)
 
 
+@app.route('/teams/<string:team_nickname>/<int:player_id>')
+@app.route('/teams/<string:team_nickname>/players/<int:player_id>')
+def show_player(team_nickname, player_id):
+    '''
+    show player route
+    Render the details of a given player.
+    The route shows the team nickname for cosmetics only.
+
+    @param player_id: the id of the player to show
+    :returns: render template
+    :raises: DBError for any DB transaction issues
+    '''
+    session = DBSession()
+    try:
+        player = session.query(Player).filter_by(id=player_id).one()
+    except:
+        session.rollback()
+        raise DBError(payload=traceback.format_exc())
+    finally:
+        session.close()
+
+    return render_template(
+        'player.html',
+        player=player,
+        team_nickname=team_nickname
+    )
+
+
 def is_jersey_number_valid(form_data, team_id):
     '''
-    Utility method: jersey number validator
+    Utility method: jersey number validator.
 
     @param form_data: the data collected from the user-submitted form
     @param team_id: the id of the team to check for unique jersey number
@@ -184,9 +212,9 @@ def is_jersey_number_valid(form_data, team_id):
     'GET', 'POST'])
 def add_player(team_nickname):
     '''
-    new player route
-    GET: render the template to add a new player
-    POST: add a player to the DB
+    new player route.
+    GET: render the template to add a new player.
+    POST: add a player to the DB.
 
     @param team_nickname: the nickname of the team to list players for
     :returns: render template
@@ -268,9 +296,9 @@ def add_player(team_nickname):
            methods=['GET', 'POST'])
 def edit_player(team_nickname, player_id):
     '''
-    edit player route
-    GET: render the template to edit a player
-    POST: edit the DB entry
+    edit player route.
+    GET: render the template to edit a player.
+    POST: edit the DB entry.
 
     @param team_nickname: the nickname of the team to list players for
     @param player_id: the id of the player to be edited
@@ -369,9 +397,9 @@ def edit_player(team_nickname, player_id):
            methods=['GET', 'POST'])
 def delete_player(team_nickname, player_id):
     '''
-    delete player route
-    GET: render the template to delete a player
-    POST: delete the DB entry
+    delete player route.
+    GET: render the template to delete a player.
+    POST: delete the DB entry.
 
     @param team_nickname: the nickname of the team to list players for
     @param player_id: the id of the player to be deleted

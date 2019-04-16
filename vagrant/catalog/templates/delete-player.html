@@ -28,7 +28,7 @@
 				<div class="form-group">
 					<button type="submit" class="btn btn-default" id="submit" type="submit">
 					<span class="glyphicon glyphicon-glass" aria-hidden="true"></span>Delete</button>
-					<a href= '{{url_for('show_players', team_nickname=team_nickname)}}'>Cancel</a>
+					<a href= '{{url_for('show_player', team_nickname=team_nickname, player_id=item.id)}}'>Cancel</a>
 				</div>
 			</form>
 		</div>

@@ -1,0 +1,48 @@
+{% extends "main.html" %}
+{% block content %}
+{% include "header.html" %}
+	<div class="row divider green">
+		<div class="col-md-12"></div>
+	</div>
+	<div class="row banner menu">
+		<div class="col-md-11 col-md-offset-1 padding-none">
+			<h1>{{player.name}}</h1>
+		</div>
+	</div>
+
+	<div class = 'flash'>
+		{% with messages = get_flashed_messages() %}
+			{% if messages %}
+				<ul>
+				{% for message in messages %}
+					<li> <strong> {{ message }} </strong> </li>
+				{% endfor %}
+				</ul>
+			{% endif %}
+		{% endwith %}
+	</div>	
+
+	<div class="row">
+		<div class="col-md-6 col-md-offset-1 padding-top">
+            <div class="form-group">
+                <label for="name">Name:</label>
+                <input type ="text" maxlength="50" class="form-control" name="name" value='{{player.name}}' readonly>
+
+                <p></p>
+                <label for="jersey_number">Jersey Number:</label>
+                <input type ="text" maxlength="2" class="form-control" name="jersey_number" value='{{player.jersey_number}}' readonly>
+                
+                <p></p>
+                <label for="position">Position:</label>
+                <input type ="text" maxlength="50" class="form-control" name="position" value='{{player.position}}' readonly>                    
+                <p></p>
+                
+                <p></p>
+                <a href='{{url_for('edit_player', team_nickname=team_nickname, player_id=player.id)}}'>Edit</a>  |  
+                <a href='{{url_for('delete_player', team_nickname=team_nickname, player_id=player.id)}}'>Delete</a>  |  
+                <a href='{{url_for('show_players', team_nickname=team_nickname)}}'>Cancel</a>
+            </div>
+		</div>
+	</div>
+{% endblock %}
+

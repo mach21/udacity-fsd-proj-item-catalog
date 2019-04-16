@@ -48,23 +48,21 @@
 				<h2>Goaltenders</h2>
 					{% for i in items %}
 						{% if i.position == 'Goaltender' %}
+							<a href = '{{url_for('show_player', team_nickname=team.nickname, player_id=i.id)}}'>
 							<div class="player">
 								<h3>{{i.name}} ({{i.jersey_number}})</h3>
-								<a href='{{url_for('edit_player', team_nickname = team.nickname, player_id=i.id ) }}'>Edit</a> | 
-								<a href='{{url_for('delete_player', team_nickname = team.nickname, player_id=i.id ) }}'>Delete</a>
 							</div>
 						{% endif %}
 					{% endfor %}
 			</div>
-			<div class="col-md-4">			
+			<div class="col-md-4">
 				<h2>Defencemen</h2>
                     {% for i in items %}
                         {% if i.position == 'Defenceman' %}
-                            <div class="player">
+							<a href = '{{url_for('show_player', team_nickname=team.nickname, player_id=i.id)}}'>	
+							<div class="player">
 								<h3>{{i.name}} ({{i.jersey_number}})</h3>
-								<a href='{{url_for('edit_player', team_nickname = team.nickname, player_id=i.id ) }}'>Edit</a> | 
-								<a href='{{url_for('delete_player', team_nickname = team.nickname, player_id=i.id ) }}'>Delete</a>								
-                            </div>
+							</div>
                         {% endif %}
                     {% endfor %}
 			</div>
@@ -72,11 +70,10 @@
 				<h2>Offencemen</h2>
                     {% for i in items %}
                         {% if i.position == 'Offenceman' %}
-                            <div class="player">
+							<a href = '{{url_for('show_player', team_nickname=team.nickname, player_id=i.id)}}'>	
+							<div class="player">
 								<h3>{{i.name}} ({{i.jersey_number}})</h3>
-								<a href='{{url_for('edit_player', team_nickname = team.nickname, player_id=i.id ) }}'>Edit</a> | 
-								<a href='{{url_for('delete_player', team_nickname = team.nickname, player_id=i.id ) }}'>Delete</a>								
-                            </div>
+							</div>
                         {% endif %}
                     {% endfor %}
         </div>
