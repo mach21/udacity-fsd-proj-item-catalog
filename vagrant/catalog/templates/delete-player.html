@@ -9,6 +9,19 @@
 			<h1> Are you sure you want to delete {{item.name}}? </h1>
 		</div>
 	</div>
+
+	<div class = 'flash'>
+		{% with messages = get_flashed_messages() %}
+			{% if messages %}
+				<ul>
+				{% for message in messages %}
+					<li> <strong> {{ message }} </strong> </li>
+				{% endfor %}
+				</ul>
+			{% endif %}
+		{% endwith %}
+	</div>
+
 	<div class="row">
 		<div class="col-md-6 col-md-offset-1 padding-top">
 			<form action= "{{url_for('delete_player', team_nickname=team_nickname, player_id=item.id)}}" method = 'POST'>
