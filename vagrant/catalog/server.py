@@ -23,8 +23,6 @@ __DEBUG__ = False
 
 
 class DBError(Exception):
-    status_code = 500
-
     def __init__(self, payload=None):
         Exception.__init__(self)
         self.message = 'Houston, we have a DB problem...'
@@ -41,6 +39,12 @@ class DBError(Exception):
 
 @app.errorhandler(DBError)
 def handle_db_error(error):
+    '''
+    DB error handler.
+
+    @param error: the caught error
+    :returns: json-formatted error
+    '''
     response = jsonify(error.to_dict())
     response.status_code = error.status_code
     return response
@@ -49,7 +53,10 @@ def handle_db_error(error):
 @app.route('/api/v1/teams/')
 def show_teams_json():
     '''
-    API endpoint to list all teams in the DB.
+    API endpoint to list all teams in the DB
+
+    :returns: json-formatted list of teams in the DB
+    :raises: DBError for any DB transaction issues
     '''
     session = DBSession()
     try:
@@ -66,7 +73,10 @@ def show_teams_json():
 @app.route('/api/v1/players/')
 def get_players_json():
     '''
-    API endpoint to list all players in the DB.
+    API endpoint to list all players in the DB
+
+    :returns: json-formatted list of players in the DB
+    :raises: DBError for any DB transaction issues
     '''
     session = DBSession()
     try:
@@ -83,6 +93,13 @@ def get_players_json():
 @app.route('/')
 @app.route('/teams/')
 def show_teams():
+    '''
+    show teams route
+    Render the list of teams in the DB
+
+    :returns: render template
+    :raises: DBError for any DB transaction issues
+    '''
     session = DBSession()
     try:
         teams = session.query(Team).order_by(asc(Team.name))
@@ -98,6 +115,14 @@ def show_teams():
 @app.route('/teams/<string:team_nickname>/')
 @app.route('/teams/<string:team_nickname>/players/')
 def show_players(team_nickname):
+    '''
+    show players route
+    Render the list of players for a given team
+
+    @param team_nickname: the nickname of the team to list players for
+    :returns: render template
+    :raises: DBError for any DB transaction issues
+    '''
     session = DBSession()
     try:
         team = session.query(Team).filter_by(nickname=team_nickname).one()
@@ -115,6 +140,14 @@ def show_players(team_nickname):
 def is_jersey_number_valid(form_data, team_id):
     '''
     Utility method: jersey number validator
+
+    @param form_data: the data collected from the user-submitted form
+    @param team_id: the id of the team to check for unique jersey number
+    :returns: (bool, int) tuple, where
+        bool - signifies the jersey_number is either valid or invalid
+        int - the jersey_number, if it is valid or already taken OR
+              a numeric code if it is invalid
+    :raises: DBError for any DB transaction issues
     '''
 
     # is integer
@@ -151,6 +184,15 @@ def is_jersey_number_valid(form_data, team_id):
 @app.route('/teams/<string:team_nickname>/players/new/', methods=[
     'GET', 'POST'])
 def add_player(team_nickname):
+    '''
+    new player route
+    GET: render the template to add a new player
+    POST: add a player to the DB
+
+    @param team_nickname: the nickname of the team to list players for
+    :returns: render template
+    :raises: DBError for any DB transaction issues
+    '''
     session = DBSession()
     try:
         team = session.query(Team).filter_by(nickname=team_nickname).one()
@@ -226,6 +268,16 @@ def add_player(team_nickname):
 @app.route('/teams/<string:team_nickname>/<int:player_id>/edit',
            methods=['GET', 'POST'])
 def edit_player(team_nickname, player_id):
+    '''
+    edit player route
+    GET: render the template to edit a player
+    POST: edit the DB entry
+
+    @param team_nickname: the nickname of the team to list players for
+    @param player_id: the id of the player to be edited
+    :returns: render template
+    :raises: DBError for any DB transaction issues
+    '''
     session = DBSession()
     try:
         editedPlayer = session.query(Player).filter_by(id=player_id).one()
@@ -317,6 +369,16 @@ def edit_player(team_nickname, player_id):
 @app.route('/teams/<string:team_nickname>/<int:player_id>/delete/',
            methods=['GET', 'POST'])
 def delete_player(team_nickname, player_id):
+    '''
+    delete player route
+    GET: render the template to delete a player
+    POST: delete the DB entry
+
+    @param team_nickname: the nickname of the team to list players for
+    @param player_id: the id of the player to be deleted
+    :returns: render template
+    :raises: DBError for any DB transaction issues
+    '''
     session = DBSession()
     try:
         itemToDelete = session.query(Player).filter_by(id=player_id).one()
