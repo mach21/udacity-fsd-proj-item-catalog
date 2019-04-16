@@ -122,7 +122,7 @@ def is_jersey_number_valid(form_data, team_id):
         return (False, 1)
 
     # is between 1 and 99
-    if not (jersey_number > 1 and jersey_number < 100):
+    if not (jersey_number > 0 and jersey_number < 100):
         return (False, 2)
 
     # is not already taken
