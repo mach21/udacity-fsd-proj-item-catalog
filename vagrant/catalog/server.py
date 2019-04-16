@@ -177,9 +177,20 @@ def add_player(team_nickname):
                 team_nickname=team_nickname
             )
 
-        # get new player data from form
+        # validate new player name isn't empty
+        name = bleach.clean(request.form['name'])
+        if name == '':
+            flash(
+                'Player name can not be empty! Please name this person.'
+            )
+            return render_template(
+                'new-player.html',
+                team_nickname=team_nickname
+            )
+
+        # compile new player data
         new_player = Player(
-            name=bleach.clean(request.form['name']),
+            name=name,
             position=bleach.clean(request.form['position']),
             jersey_number=jersey_number,
             team_id=team.id
@@ -258,8 +269,20 @@ def edit_player(team_nickname, player_id):
             else:
                 editedPlayer.jersey_number = jersey_number
 
-        if request.form['name']:
-            editedPlayer.name = bleach.clean(request.form['name'])
+        # validate new player name isn't empty
+        name = bleach.clean(request.form['name'])
+        if name == '':
+            flash(
+                'Player name can not be empty! Please name this person.'
+            )
+            return render_template(
+                'edit-player.html',
+                team_nickname=team_nickname,
+                player_id=player_id,
+                item=editedPlayer
+            )
+        editedPlayer.name = name
+
         if request.form['position']:
             editedPlayer.position = bleach.clean(request.form['position'])
 
