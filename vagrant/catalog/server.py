@@ -259,9 +259,9 @@ def edit_player(team_nickname, player_id):
                 editedPlayer.jersey_number = jersey_number
 
         if request.form['name']:
-            editedPlayer.name = request.form['name']
+            editedPlayer.name = bleach.clean(request.form['name'])
         if request.form['position']:
-            editedPlayer.position = request.form['position']
+            editedPlayer.position = bleach.clean(request.form['position'])
 
         session = DBSession()
         try:
