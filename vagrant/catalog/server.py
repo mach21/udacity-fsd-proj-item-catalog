@@ -4,7 +4,6 @@ from flask import Flask, jsonify, render_template, request, redirect
 from flask import jsonify, url_for, flash
 from sqlalchemy import create_engine, asc
 from sqlalchemy.orm import sessionmaker
-from sqlalchemy.exc import IntegrityError
 from db_setup import Base, User, Team, Player
 import random
 import bleach
@@ -50,36 +49,17 @@ def handle_db_error(error):
     return response
 
 
-@app.route('/api/v1/teams/')
-def show_teams_json():
+@app.route('/api/v1/catalog.json')
+def get_catalog_json():
     '''
-    API endpoint to list all teams in the DB
+    API endpoint to pretty-list the entire catalog
 
-    :returns: json-formatted list of teams in the DB
+    :returns: json-formatted catalog
     :raises: DBError for any DB transaction issues
     '''
     session = DBSession()
     try:
         teams = session.query(Team).all()
-    except:
-        session.rollback()
-        raise DBError(payload=traceback.format_exc())
-    finally:
-        session.close()
-
-    return jsonify(teams=[team.serialize for team in teams])
-
-
-@app.route('/api/v1/players/')
-def get_players_json():
-    '''
-    API endpoint to list all players in the DB
-
-    :returns: json-formatted list of players in the DB
-    :raises: DBError for any DB transaction issues
-    '''
-    session = DBSession()
-    try:
         players = session.query(Player).all()
     except:
         session.rollback()
@@ -87,7 +67,26 @@ def get_players_json():
     finally:
         session.close()
 
-    return jsonify(players=[player.serialize for player in players])
+    response = {'teams': []}
+    for team in teams:
+        t_players = [pl for pl in players if pl.team_id == team.id]
+        response['teams'].append(
+            {
+                'id': team.id,
+                'name': team.name,
+                'nickname': team.nickname,
+                'players': [
+                    {
+                        'id': player.id,
+                        'name': player.name,
+                        'jersery_number': player.jersey_number,
+                        'position': player.position
+                    } for player in t_players
+                ]
+            }
+        )
+
+    return jsonify(response)
 
 
 @app.route('/')
