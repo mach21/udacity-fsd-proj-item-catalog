@@ -294,6 +294,8 @@ def add_player(team_nickname):
 
 @app.route('/teams/<string:team_nickname>/<int:player_id>/edit',
            methods=['GET', 'POST'])
+@app.route('/teams/<string:team_nickname>/players/<int:player_id>/edit',
+           methods=['GET', 'POST'])
 def edit_player(team_nickname, player_id):
     '''
     edit player route.
@@ -395,6 +397,8 @@ def edit_player(team_nickname, player_id):
 
 @app.route('/teams/<string:team_nickname>/<int:player_id>/delete/',
            methods=['GET', 'POST'])
+@app.route('/teams/<string:team_nickname>/players/<int:player_id>/delete/',
+           methods=['GET', 'POST'])           
 def delete_player(team_nickname, player_id):
     '''
     delete player route.
