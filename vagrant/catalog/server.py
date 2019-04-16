@@ -19,6 +19,9 @@ Base.metadata.bind = engine
 DBSession = sessionmaker(bind=engine)
 
 
+__DEBUG__ = False
+
+
 class DBError(Exception):
     status_code = 500
 
@@ -30,7 +33,8 @@ class DBError(Exception):
 
     def to_dict(self):
         rv = {}
-        rv['traceback'] = self.payload or ''
+        if __DEBUG__:
+            rv['traceback'] = self.payload or ''
         rv['message'] = self.message
         return rv
 
