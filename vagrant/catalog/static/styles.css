@@ -54,14 +54,13 @@ h3 {
 	padding: 0;
 }
 .btn {
-	padding: 20px;
 	margin: 0;
-	border-color: #9FB80A;
+	border-color: rgb(255, 123, 0);
 	border-width: 2px;
-	color: #9FB80A;;
+	color: rgb(255, 123, 0);;
 }
 .btn:hover {
-	border-color: #9FB80A;
+	border-color: rgb(255, 123, 0);
 }
 .btn.delete {
 	border-color: #aaaaaa;
@@ -93,10 +92,10 @@ h3 {
 	height: 15px;
 }
 .divider.blue {
-	background-color: #42C3C9;
+	background-color: rgb(4,30,66);
 }
-.divider.green {
-	background-color: #9FB80A;
+.divider.orange {
+	background-color: rgb(255, 123, 0);
 }
 .banner.main {
 	height: 150px;
@@ -107,7 +106,7 @@ h3 {
 }
 .banner.menu {
 	height: 150px;
-	background-color: #E1E17F;
+	background-color: rgb(255, 184, 028);
 }
 .banner.profile {
 	height: 150px;
@@ -121,7 +120,7 @@ h3 {
  	padding: 20px;
 }
  .team-list:hover {
- 	background-color: #e1e17f;
+ 	background-color: rgb(255, 184, 028);
  	padding: 20px;
 }
 .player {
@@ -135,7 +134,6 @@ h3 {
 	background-color: #98FB98;
 	width:100%;
 	text-decoration: none;
-
 }
 
 .flash li {
