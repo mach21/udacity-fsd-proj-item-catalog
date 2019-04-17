@@ -12,11 +12,10 @@
 
 	<div class="row padding-top padding-bottom">
 		<div class="col-md-1"></div>
-		<div class="col-md-10 padding-none">
-			
-		</div>
+		<div class="col-md-10 padding-none"></div>
 		<div class="col-md-1"></div>
 	</div>
+	
 	{% for team in teams %}
 		<a href = "{{url_for('show_players', team_nickname = team.nickname)}}">
 			<div class="row">
@@ -28,4 +27,5 @@
 			</div>
 		</a>
 	{% endfor %}
+
 {% endblock %}
