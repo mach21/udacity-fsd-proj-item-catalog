@@ -51,7 +51,8 @@ class Player(Base):
             'name': self.name,
             'jersey_number': self.jersey_number,
             'position': self.position,
-            'team_id': self.team_id
+            'team_id': self.team_id,
+            'user_id': self.user_id
         }
 
 
