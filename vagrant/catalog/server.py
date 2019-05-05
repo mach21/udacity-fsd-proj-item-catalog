@@ -252,6 +252,9 @@ def add_player(team_nickname):
     :returns: render template
     :raises: DBError for any DB transaction issues
     '''
+    if 'username' not in login_session:
+        return redirect('/login')
+
     session = DBSession()
     try:
         team = session.query(Team).filter_by(nickname=team_nickname).one()
@@ -298,7 +301,8 @@ def add_player(team_nickname):
             name=name,
             position=bleach.clean(request.form['position']),
             jersey_number=jersey_number,
-            team_id=team.id
+            team_id=team.id,
+            user_id=login_session['user_id']
         )
 
         session = DBSession()
@@ -339,6 +343,9 @@ def edit_player(team_nickname, player_id):
     :returns: render template
     :raises: DBError for any DB transaction issues
     '''
+    if 'username' not in login_session:
+        return redirect('/login')
+
     session = DBSession()
     try:
         editedPlayer = session.query(Player).filter_by(id=player_id).one()
@@ -347,6 +354,15 @@ def edit_player(team_nickname, player_id):
         raise DBError(payload=traceback.format_exc())
     finally:
         session.close()
+
+    if editedPlayer.user_id != login_session['user_id']:
+            flash('You are not authorized to edit this player!')
+            return redirect(
+                '/teams/{}/players/{}'.format(
+                    team_nickname,
+                    player_id
+                )
+            )
 
     if request.method == 'POST':
         jersey_validity = is_jersey_number_valid(
@@ -442,6 +458,9 @@ def delete_player(team_nickname, player_id):
     :returns: render template
     :raises: DBError for any DB transaction issues
     '''
+    if 'username' not in login_session:
+        return redirect('/login')
+
     session = DBSession()
     try:
         itemToDelete = session.query(Player).filter_by(id=player_id).one()
@@ -450,6 +469,15 @@ def delete_player(team_nickname, player_id):
         raise DBError(payload=traceback.format_exc())
     finally:
         session.close()
+
+    if itemToDelete.user_id != login_session['user_id']:
+            flash('You are not authorized to delete this player!')
+            return redirect(
+                '/teams/{}/players/{}'.format(
+                    team_nickname,
+                    player_id
+                )
+            )
 
     if request.method == 'POST':
         session = DBSession()
@@ -622,9 +650,9 @@ def disconnect():
         headers={'content-type': 'application/x-www-form-urlencoded'}
     )
 
+    del login_session['user_id']
     del login_session['username']
     del login_session['email']
-    del login_session['user_id']
 
     return redirect(url_for('show_teams'))
 
