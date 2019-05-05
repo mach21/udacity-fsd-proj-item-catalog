@@ -1,24 +1,32 @@
 #! $(which python3)
 
 from flask import Flask, jsonify, render_template, request, redirect
-from flask import jsonify, url_for, flash
+from flask import jsonify, url_for, flash, make_response
+from flask import session as login_session
 from sqlalchemy import create_engine, asc
 from sqlalchemy.orm import sessionmaker
+from oauth2client.client import flow_from_clientsecrets
+from oauth2client.client import FlowExchangeError
 from db_setup import Base, User, Team, Player
 import random
+import string
 import bleach
 import traceback
+import json
+import requests
 
-# instantiate Flask app
+
+CLIENT_ID = json.loads(
+    open('client_secrets.json', 'r').read())['web']['client_id']
+APPLICATION_NAME = 'NHL Team Roster'
+__DEBUG__ = True
+
 app = Flask(__name__)
 
 # connect to the DB and get a session factory
 engine = create_engine('sqlite:///roster.db')
 Base.metadata.bind = engine
 DBSession = sessionmaker(bind=engine)
-
-
-__DEBUG__ = False
 
 
 class DBError(Exception):
@@ -89,6 +97,20 @@ def get_catalog_json():
     return jsonify(response)
 
 
+@app.route('/login')
+def show_login():
+    '''
+    show login route
+    Set the session state and render the login page.
+
+    :returns: render template
+    '''
+    state = ''.join(random.choice(string.ascii_uppercase + string.digits)
+                    for x in range(32))
+    login_session['state'] = state
+    return render_template('login.html', STATE=state, CLIENT_ID=CLIENT_ID)
+
+
 @app.route('/')
 @app.route('/teams/')
 def show_teams():
@@ -108,7 +130,11 @@ def show_teams():
     finally:
         session.close()
 
-    return render_template('teams.html', teams=teams)
+    return render_template(
+        'teams.html',
+        teams=teams,
+        login_session=login_session
+    )
 
 
 @app.route('/teams/<string:team_nickname>/')
@@ -133,7 +159,12 @@ def show_players(team_nickname):
     finally:
         session.close()
 
-    return render_template('players.html', items=items, team=team)
+    return render_template(
+        'players.html',
+        items=items,
+        team=team,
+        login_session=login_session
+    )
 
 
 @app.route('/teams/<string:team_nickname>/<int:player_id>')
@@ -160,7 +191,8 @@ def show_player(team_nickname, player_id):
     return render_template(
         'player.html',
         player=player,
-        team_nickname=team_nickname
+        team_nickname=team_nickname,
+        login_session=login_session
     )
 
 
@@ -398,7 +430,7 @@ def edit_player(team_nickname, player_id):
 @app.route('/teams/<string:team_nickname>/<int:player_id>/delete/',
            methods=['GET', 'POST'])
 @app.route('/teams/<string:team_nickname>/players/<int:player_id>/delete/',
-           methods=['GET', 'POST'])           
+           methods=['GET', 'POST'])
 def delete_player(team_nickname, player_id):
     '''
     delete player route.
@@ -441,6 +473,160 @@ def delete_player(team_nickname, player_id):
             item=itemToDelete,
             team_nickname=team_nickname
         )
+
+
+def create_user(login_session):
+    '''
+    create a new user
+
+    @param login_session: an instance of login_session
+    :returns: the creaded user's id
+    :raises: DBError for any DB transaction issues
+    '''
+    session = DBSession()
+    try:
+        session.add(User(
+            name=login_session['username'],
+            email=login_session['email']
+        ))
+        session.commit()
+        user = session.query(User).filter_by(
+            email=login_session['email']
+        ).one()
+    except:
+        session.rollback()
+        raise DBError(payload=traceback.format_exc())
+    finally:
+        session.close()
+
+    return user.id
+
+
+def get_user_info(user_id):
+    '''
+    get details about the user identified by user_id
+
+    @param user_id: the user_id
+    :returns: the db row entry
+    :raises: DBError for any DB transaction issues
+    '''
+    session = DBSession()
+    try:
+        user = session.query(User).filter_by(id=user_id).one()
+    except:
+        raise DBError(payload=traceback.format_exc())
+    finally:
+        session.close()
+
+    return user
+
+
+def get_user_id(email):
+    '''
+    get a user's id based on their email address
+
+    @param email: the user email address
+    :returns: user.id or None
+    :raises: DBError for any DB transaction issues
+    '''
+    session = DBSession()
+    try:
+        user = session.query(User).filter_by(email=email).one_or_none()
+    except:
+        raise DBError(payload=traceback.format_exc())
+    finally:
+        session.close()
+
+    return user.id if user is not None else None
+
+
+@app.route('/gconnect', methods=['POST'])
+def gconnect():
+    # Validate state token
+    if request.args.get('state') != login_session['state']:
+        response = make_response(json.dumps('Invalid state parameter.'), 401)
+        response.headers['Content-Type'] = 'application/json'
+        return response
+    # Obtain authorization code
+    code = request.data
+
+    try:
+        # Upgrade the authorization code into a credentials object
+        oauth_flow = flow_from_clientsecrets('client_secrets.json', scope='')
+        oauth_flow.redirect_uri = 'postmessage'
+        credentials = oauth_flow.step2_exchange(code)
+    except FlowExchangeError:
+        response = make_response(
+            json.dumps('Failed to upgrade the authorization code.'), 401)
+        response.headers['Content-Type'] = 'application/json'
+        return response
+
+    # Check that the access token is valid.
+    access_token = credentials.access_token
+    url = ('https://www.googleapis.com/oauth2/v1/tokeninfo?access_token=%s'
+           % access_token)
+    result = requests.get(url).json()
+
+    # If there was an error in the access token info, abort.
+    if result.get('error') is not None:
+        response = make_response(json.dumps(result.get('error')), 500)
+        response.headers['Content-Type'] = 'application/json'
+        return response
+
+    # Verify that the access token is valid for this app.
+    if result['issued_to'] != CLIENT_ID:
+        response = make_response(
+            json.dumps("Token's client ID does not match app's."), 401)
+        response.headers['Content-Type'] = 'application/json'
+        return response
+
+    # Store the access token in the session for later use.
+    login_session['access_token'] = credentials.access_token
+
+    # Get user info
+    userinfo_url = "https://www.googleapis.com/oauth2/v1/userinfo"
+    params = {'access_token': credentials.access_token, 'alt': 'json'}
+    answer = requests.get(userinfo_url, params=params)
+
+    data = answer.json()
+
+    login_session['username'] = data['name']
+    login_session['email'] = data['email']
+
+    # see if user exists, if it doesn't make a new one
+    user_id = get_user_id(data["email"])
+    if user_id is None:
+        user_id = create_user(login_session)
+    login_session['user_id'] = user_id
+
+    output = ''
+    output += '<h1>Welcome, '
+    output += login_session['username']
+    output += '!</h1>'
+    flash("You are now logged in as {}".format(login_session['username']))
+
+    return output
+
+
+@app.route('/disconnect')
+def disconnect():
+    # Only disconnect a connected user.
+    access_token = login_session.get('access_token')
+    if access_token is None or login_session.get('username') is None:
+        return redirect(url_for('show_teams'))
+
+    # Invalidate access token
+    requests.post(
+        'https://accounts.google.com/o/oauth2/revoke',
+        params={'token': access_token},
+        headers={'content-type': 'application/x-www-form-urlencoded'}
+    )
+
+    del login_session['username']
+    del login_session['email']
+    del login_session['user_id']
+
+    return redirect(url_for('show_teams'))
 
 
 if __name__ == '__main__':
