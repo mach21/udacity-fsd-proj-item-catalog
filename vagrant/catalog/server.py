@@ -570,6 +570,9 @@ def get_user_id(email):
 
 @app.route('/gconnect', methods=['POST'])
 def gconnect():
+    '''
+    handle ajax call to log user in with Google
+    '''
     # Validate state token
     if request.args.get('state') != login_session['state']:
         response = make_response(json.dumps('Invalid state parameter.'), 401)
@@ -611,17 +614,13 @@ def gconnect():
     # Store the access token in the session for later use.
     login_session['access_token'] = credentials.access_token
 
-    # Get user info
     userinfo_url = "https://www.googleapis.com/oauth2/v1/userinfo"
     params = {'access_token': credentials.access_token, 'alt': 'json'}
-    answer = requests.get(userinfo_url, params=params)
-
-    data = answer.json()
-
+    data = requests.get(userinfo_url, params=params).json()
     login_session['username'] = data['name']
     login_session['email'] = data['email']
 
-    # see if user exists, if it doesn't make a new one
+    # create a new user if neccessary
     user_id = get_user_id(data["email"])
     if user_id is None:
         user_id = create_user(login_session)
@@ -638,7 +637,10 @@ def gconnect():
 
 @app.route('/disconnect')
 def disconnect():
-    # Only disconnect a connected user.
+    '''
+    log Google user out
+    '''
+    # Only disconnect a connected user
     access_token = login_session.get('access_token')
     if access_token is None or login_session.get('username') is None:
         return redirect(url_for('show_teams'))
@@ -654,6 +656,7 @@ def disconnect():
     del login_session['username']
     del login_session['email']
 
+    flash('You have been logged out.')
     return redirect(url_for('show_teams'))
 
 
