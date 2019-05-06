@@ -18,6 +18,9 @@
 	</head>
 	
 	<body>
+		{% extends "main.html" %}
+		{% block content %}
+		{% include "header.html" %}
 
 		<div class="row divider blue">
 				<div class="col-md-12"></div>
@@ -78,5 +81,7 @@
 				}
 			}
 		</script>
+		{% endblock %}
+		
 	</body>
 </html>
