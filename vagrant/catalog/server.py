@@ -571,6 +571,7 @@ def get_user_id(email):
 def gconnect():
     '''
     handle ajax call to log user in with Google
+    code derived from https://github.com/udacity/ud330/tree/master/Lesson4/step2
     '''
     # Validate state token
     if request.args.get('state') != login_session['state']:
@@ -638,6 +639,7 @@ def gconnect():
 def disconnect():
     '''
     log Google user out
+    code derived from https://github.com/udacity/ud330/tree/master/Lesson4/step2
     '''
     # Only disconnect a connected user
     access_token = login_session.get('access_token')
