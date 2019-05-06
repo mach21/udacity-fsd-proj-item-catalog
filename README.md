@@ -26,7 +26,7 @@ Next, this command will install the basic environment prerequisites:
 vagrant@vagrant:/vagrant/catalog$ chmod +x bootstrap.sh && ./bootstrap.sh
 ````
 
-### Virtual Environment
+### Activate Virtual Environment
 
 Install package dependencies and activate the python virtual environment with:
 
@@ -37,7 +37,7 @@ vagrant@vagrant:/vagrant/catalog$ source dev-virtenv.sh
 ### Pre-populate DB
 
 ````
-vagrant@vagrant:/vagrant/catalog$ python3 db_populate.py
+(.virtenv) vagrant@vagrant:/vagrant/catalog$ python3 db_populate.py
 ````
 
 ### Run the Server
@@ -45,7 +45,7 @@ vagrant@vagrant:/vagrant/catalog$ python3 db_populate.py
 We're finally ready to run the flask server:
 
 ````
-vagrant@vagrant:/vagrant/catalog$ python3 -m server
+(.virtenv) vagrant@vagrant:/vagrant/catalog$ python3 -m server
 ````
 
 ### Play Around
@@ -55,6 +55,12 @@ You will only be allowed to create new players after logging in with Google (hit
 ### Stop the Server
 
 Press Ctrl-C in the terminal.
+
+### Deactivate the Virtual Environment
+
+````
+(.virtenv) vagrant@vagrant:/vagrant/catalog$ deactivate
+````
 
 ### Stop the VM
 
