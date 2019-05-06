@@ -18,8 +18,7 @@ import requests
 
 CLIENT_ID = json.loads(
     open('client_secrets.json', 'r').read())['web']['client_id']
-APPLICATION_NAME = 'NHL Team Roster'
-__DEBUG__ = True
+__DEBUG__ = False
 
 app = Flask(__name__)
 
