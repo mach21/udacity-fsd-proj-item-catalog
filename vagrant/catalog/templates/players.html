@@ -43,41 +43,44 @@
 	</div>
 
 		<div class="row">
+
 			<div class="col-md-1"></div>
+
 			<div class="col-md-3">
 				<h2>Goaltenders</h2>
 					{% for i in items %}
 						{% if i.position == 'Goaltender' %}
 							<a href = '{{url_for('show_player', team_nickname=team.nickname, player_id=i.id)}}'>
-							<div class="player">
-								<h3>{{i.name}} ({{i.jersey_number}})</h3>
-							</div>
+							<div class="player"><h3>{{i.name}} ({{i.jersey_number}})</h3></div>
+							</a>
 						{% endif %}
 					{% endfor %}
 			</div>
+
 			<div class="col-md-4">
 				<h2>Defencemen</h2>
                     {% for i in items %}
                         {% if i.position == 'Defenceman' %}
-							<a href = '{{url_for('show_player', team_nickname=team.nickname, player_id=i.id)}}'>	
-							<div class="player">
-								<h3>{{i.name}} ({{i.jersey_number}})</h3>
-							</div>
+							<a href = '{{url_for('show_player', team_nickname=team.nickname, player_id=i.id)}}'>
+							<div class="player"><h3>{{i.name}} ({{i.jersey_number}})</h3></div>
+							</a>
                         {% endif %}
                     {% endfor %}
 			</div>
+
 			<div class="col-md-3">
 				<h2>Offencemen</h2>
                     {% for i in items %}
                         {% if i.position == 'Offenceman' %}
-							<a href = '{{url_for('show_player', team_nickname=team.nickname, player_id=i.id)}}'>	
-							<div class="player">
-								<h3>{{i.name}} ({{i.jersey_number}})</h3>
-							</div>
+							<a href = '{{url_for('show_player', team_nickname=team.nickname, player_id=i.id)}}'>
+							<div class="player"><h3>{{i.name}} ({{i.jersey_number}})</h3></div>
+							</a>
                         {% endif %}
                     {% endfor %}
-        </div>
-        <div class="col-md-1"></div>
+			</div>
+			
+			<div class="col-md-1"></div>
+
 		</div>
 
 {% endblock %}
